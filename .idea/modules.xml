@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Graphics.iml" filepath="$PROJECT_DIR$/Graphics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RAYTRACING/RAYTRACING.iml" filepath="$PROJECT_DIR$/RAYTRACING/RAYTRACING.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ZELDA/ZELDA.iml" filepath="$PROJECT_DIR$/ZELDA/ZELDA.iml" />
     </modules>
   </component>
 </project>
