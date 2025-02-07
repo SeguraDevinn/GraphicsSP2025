@@ -2,7 +2,7 @@ public class RayTracer {
     public static Intersection intersectRayTriangle(Ray ray, Vector3 v0, Vector3 v1, Vector3 v2) {
         final double EPSILON = 0.0000001;
         Vector3 edge1 = v1.subtract(v0);
-        Vector3 edge2 = v2.subctact(v0);
+        Vector3 edge2 = v2.subtract(v0);
         Vector3 h = ray.direction.cross(edge2);
         double a = edge1.dot(h);
         if (a > -EPSILON && a < EPSILON) {
