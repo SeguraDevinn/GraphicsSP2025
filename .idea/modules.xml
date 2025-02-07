@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Graphics.iml" filepath="$PROJECT_DIR$/Graphics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RAYTRACING/src/RAYTRACING.iml" filepath="$PROJECT_DIR$/RAYTRACING/src/RAYTRACING.iml" />
     </modules>
   </component>
 </project>
