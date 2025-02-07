@@ -1,3 +1,6 @@
+import java.io.*;
+import java.lang.*;
+
 public class OBJParser {
     public static Scene parse(String filePath) throws IOException {
         Scene scene = new Scene();
