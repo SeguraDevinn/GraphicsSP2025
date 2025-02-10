@@ -1,3 +1,6 @@
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 public class RenderTask implements Runnable {
     private Scene scene;
     private Camera camera;
