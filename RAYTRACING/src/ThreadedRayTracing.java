@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 
 public class ThreadedRayTracing {
-    static String filePath = "/Users/devinnsegura/IdeaProjects/Graphics/RAYTRACING/src/teapot.obj";
+    static String filePath = "RAYTRACING/src/teapot.obj";
     public static void main(String[] args) throws IOException {
         Scene scene = OBJParser.parse(filePath);
         int originalVertexCount = scene.vertices.size();
