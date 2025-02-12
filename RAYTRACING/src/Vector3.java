@@ -28,7 +28,11 @@ public class Vector3 {
     }
 
     Vector3 normalize() {
-        double length = Math.sqrt(x * y + y * y + z * z);
+        double length = Math.sqrt(x * x + y * y + z * z);
         return new Vector3(x / length, y / length, z / length);
+    }
+    //Added code
+    Vector3 add(Vector3 v) {
+    return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 }

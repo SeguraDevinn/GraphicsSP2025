@@ -17,7 +17,8 @@ public class ThreadedRayTracing {
         adjustFaceIndices(secondTeapot, originalVertexCount);
         scene.vertices.addAll(secondTeapot.vertices);
         scene.faces.addAll(secondTeapot.faces);
-        Camera camera = new Camera(new Vector3(0, 2, 6), new Vector3(0, 0, -1), 100);
+        // changed postion of camera
+        Camera camera = new Camera(new Vector3(0, 3, 10), new Vector3(0, -0.2, -1), 100);
         int width = 800;
         int height = 600;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

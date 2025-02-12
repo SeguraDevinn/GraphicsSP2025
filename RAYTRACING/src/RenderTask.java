@@ -10,6 +10,8 @@ public class RenderTask implements Runnable {
     private int startY;
     private int endY;
 
+    private static final Vector3 LIGHT_POSITION = new Vector3(10, 10, 10); // Light source position
+
     public RenderTask(Scene scene, Camera camera, BufferedImage image, int width, int height, int startY, int endY) {
         this.scene = scene;
         this.camera = camera;
@@ -60,18 +62,29 @@ public class RenderTask implements Runnable {
         }
 
         if (closestIntersection != null) {
-            // Calculate reflection
+            Vector3 intersectionPoint = closestIntersection.point;
+            Vector3 normal = closestIntersection.normal;
+            Vector3 lightDir = LIGHT_POSITION.subtract(intersectionPoint).normalize();
+
+            // Get soft shadow factor (0 = fully lit, 1 = fully shadowed)
+            double shadowFactor = RayTracer.getShadowFactor(intersectionPoint, LIGHT_POSITION, scene);
+
+            // Compute shading
+            double ambient = 0.1;
+            double diffuse = Math.max(normal.dot(lightDir), 0.0);
+            double shading = ambient + (1.0 - shadowFactor) * diffuse; // Reduce light intensity in shadow
+            shading = Math.min(shading * 255, 255);
+            int shadeColor = (int) shading;
+
+            // Compute reflection
             Vector3 reflectedDirection = reflect(ray.direction, closestIntersection.normal).normalize();
             Ray reflectedRay = new Ray(closestIntersection.point, reflectedDirection);
-
-            // Trace the reflected ray recursively
             Color reflectedColor = traceRay(reflectedRay, scene, depth + 1);
 
-            // Mix original hit color with reflected color (e.g., assume reflective surfaces are white)
-            int r = (int) (0.5 * reflectedColor.getRed() + 0.5 * 255);
-            int g = (int) (0.5 * reflectedColor.getGreen() + 0.5 * 255);
-            int b = (int) (0.5 * reflectedColor.getBlue() + 0.5 * 255);
-
+            // Mix diffuse & reflection
+            int r = (int) (0.5 * reflectedColor.getRed() + 0.5 * shadeColor);
+            int g = (int) (0.5 * reflectedColor.getGreen() + 0.5 * shadeColor);
+            int b = (int) (0.5 * reflectedColor.getBlue() + 0.5 * shadeColor);
             return new Color(Math.min(r, 255), Math.min(g, 255), Math.min(b, 255));
         } else {
             return new Color(0, 0, 0); // Background color
@@ -86,4 +99,3 @@ public class RenderTask implements Runnable {
 
     private static final int MAX_REFLECTION_DEPTH = 3;
 }
-
