@@ -1,7 +1,3 @@
-/*
-This will be done by Devinn
- */
-
 public class Camera
 {
     Vector3 position;

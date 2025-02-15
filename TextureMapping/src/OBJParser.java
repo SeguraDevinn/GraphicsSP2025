@@ -2,11 +2,15 @@
 This will be done by Josh
  */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class OBJParser
 {
-    public static Scene parse(String flePath) throws IOException
+    public static Scene parse(String filePath) throws IOException
     {
-        Scene scene = new scene();
+        Scene scene = new Scene();
         boolean isPartOfFace = false;
 
         try (BufferedReader reader = new BufferedReader(new
