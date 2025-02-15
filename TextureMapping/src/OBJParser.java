@@ -10,7 +10,7 @@ public class OBJParser
 {
     public static Scene parse(String filePath) throws IOException
     {
-        Scene scene = new scene();
+        Scene scene = new Scene();
         boolean isPartOfFace = false;
 
         try (BufferedReader reader = new BufferedReader(new
