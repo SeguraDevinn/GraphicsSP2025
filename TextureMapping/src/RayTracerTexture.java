@@ -78,6 +78,18 @@ public class RayTracerTexture {
         }
     }
 
+    private static Color sampleTexture(BufferedImage texture, Vector2 uv) {
+        int textWidth = texture.getWidth();
+        int textHeight = texture.getHeight();
+
+        uv.x = Math.max(0, Math.min(uv.x, 1));
+        uv.y = Math.max(0, Math.min(uv.y, 1));
+
+        int texX = (int) (uv.x * (textWidth - 1));
+        int texY = (int) (uv.y * (textHeight - 1));
+
+        return new Color(texture.getRGB(texX, texY));
+    }
 
 
     private static Vector2 adjustUVForWholeFace(Vector2 interpolatedUV, Scene scene, Face closestFace) {
