@@ -1,8 +1,8 @@
 public class Face
 {
-    int[] vertices;     // indices of the vertices
-    int[] uvs;      // indices of the corresponding UV coordinates
-    boolean isPartOfFace;   // marks whether this triangle is part of a larger face
+    int[] vertices;  // Indices of the vertices
+    int[] uvs;       // Indices of the corresponding UV coordinates
+    boolean isPartOfFace;  // Marks whether this triangle is part of a larger face
 
     Face(int[] vertices, int[] uvs, boolean isPartOfFace)
     {
