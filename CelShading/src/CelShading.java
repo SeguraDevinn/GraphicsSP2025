@@ -11,6 +11,22 @@ public class CelShading {
     }
     //Franchesco
     private void loop() {
+        // This line is critical for LWJIGL’s interoperation with GLFW’s OpenGL context, or any context that is
+        // managed externally. LWJGL detects the context that is current in the current thread, creates GLCapabilities
+        // instance and makes the OpenGL bindings available for use.
+        GL.createCapabilities();
+
+        // Set up OpenGL settings, e.g., lighting, shading
+        setupLighting();
+        setupMaterial();
+
+        // Set clear color
+        glClearColor (0.0f, 1.0f, 1.0f, 0.0f);
+
+        // Run the rendering loop until the user has attempted to Close the window or pressed the ESC key
+        while (!glfwWindowShouldClose(window)) {
+            glClear
+        }
 
     }
     //Devinn
