@@ -1,8 +1,32 @@
 import java.io.IOException;
 
+import static sun.rmi.transport.TransportConstants.Version;
+
 public class CelShading {
+
+    private long window;
+    private Model model;
     //Devinn
     public void run() {
+        System.out.println("Starting LWJGL " + Version + "!");
+        try {
+            init();
+
+            if (model == null) {
+                throw new RuntimeException("Model could not be loaded. Exiting...");
+
+            }
+            loop();
+
+            cleanup();
+        } finally {
+            GLFWErrorCallback callback = glfwSetErrorCallback(null);
+
+            if (callback != null) {
+                callback.free();
+            }
+            glfwTerminate();
+        }
 
     }
     //Josh
@@ -65,6 +89,22 @@ public class CelShading {
 
     //Franchesco
     private void loop() {
+        // This line is critical for LWJIGL’s interoperation with GLFW’s OpenGL context, or any context that is
+        // managed externally. LWJGL detects the context that is current in the current thread, creates GLCapabilities
+        // instance and makes the OpenGL bindings available for use.
+        GL.createCapabilities();
+
+        // Set up OpenGL settings, e.g., lighting, shading
+        setupLighting();
+        setupMaterial();
+
+        // Set clear color
+        glClearColor (0.0f, 1.0f, 1.0f, 0.0f);
+
+        // Run the rendering loop until the user has attempted to Close the window or pressed the ESC key
+        while (!glfwWindowShouldClose(window)) {
+            glClear
+        }
 
     }
     //Devinn
