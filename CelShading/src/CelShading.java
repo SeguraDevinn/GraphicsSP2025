@@ -1,8 +1,32 @@
 import java.io.IOException;
 
+import static sun.rmi.transport.TransportConstants.Version;
+
 public class CelShading {
+
+    private long window;
+    private Model model;
     //Devinn
     public void run() {
+        System.out.println("Starting LWJGL " + Version + "!");
+        try {
+            init();
+
+            if (model == null) {
+                throw new RuntimeException("Model could not be loaded. Exiting...");
+
+            }
+            loop();
+
+            cleanup();
+        } finally {
+            GLFWErrorCallback callback = glfwSetErrorCallback(null);
+
+            if (callback != null) {
+                callback.free();
+            }
+            glfwTerminate();
+        }
 
     }
     //Josh
