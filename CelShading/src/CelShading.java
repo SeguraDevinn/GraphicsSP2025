@@ -1,5 +1,6 @@
-// javac -classpath ".;C:\Program Files\lwjgl-release-3.3.6-custom\*" CelShading.java
-// java -classpath ".;C:\Program Files\lwjgl-release-3.3.6-custom\*" CelShading
+// Copy the first command to compile, then copy the second one to run (make sure you are in CelShading folder
+//  javac -classpath "lib/lwjgl-release-3.3.6-custom/*" src/CelShading.java
+//  java -XstartOnFirstThread \-Djava.library.path="lib/lwjgl-release-3.3.6-custom" \-classpath "lib/lwjgl-release-3.3.6-custom/*:src" \CelShading
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-import static sun.rmi.transport.TransportConstants.Version;
+
 
 public class CelShading {
 
@@ -172,7 +173,7 @@ public class CelShading {
                            float centerX, float centerY, float centerZ,
                            float upX, float upY, float upZ)
     {
-        FloatBuffer matrix = BufferUtils.createFLoatBuffer(16);
+        FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
         // calculate forward vector
         float fx = centerX - eyeX;
         float fy = centerY - eyeY;
@@ -275,7 +276,7 @@ public class CelShading {
         glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
         glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-        glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+        glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     }
     //Devinn
     public void renderModel(Model model) {
