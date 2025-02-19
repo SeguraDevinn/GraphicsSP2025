@@ -127,7 +127,18 @@ public class CelShading {
 
         // Run the rendering loop until the user has attempted to Close the window or pressed the ESC key
         while (!glfwWindowShouldClose(window)) {
-            glClear
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            setupCamera();
+            renderOutline(model);
+
+            // Render the model with cel shading
+            renderModel(model);
+
+            glfwSwapBuffers(window); // Swap the color buffers
+
+            glfwPollEvents(); // Poll for window events. The key callback above will only be invoked during this call
+
+            
         }
 
     }
