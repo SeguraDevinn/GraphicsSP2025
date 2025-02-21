@@ -236,6 +236,7 @@ public class CelShading {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
+        // THIS SINGLE LINE WAS CHANGED
         glShadeModel(GL_SMOOTH);
 
         // Configure OpenGL to use the vertex colors for lighting calculations
@@ -286,8 +287,7 @@ public class CelShading {
     }
     //Devinn
     public void renderModel(Model model) {
-        // Re-enable lighting and set flat shading mode
-        //glEnable(GL_LIGHTING);
+        // THIS WAS CHANGED AS WELL
         glShadeModel(GL_SMOOTH);
 
         glEnable(GL_DEPTH_TEST);
@@ -371,7 +371,7 @@ public class CelShading {
     }
     //start of changed code(changed function passed variables)
     public void renderOutline(Model model, float outlineScaleFactor) {
-        //glDisable(GL_LIGHTING);  // Disable lighting for outline
+
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
 
@@ -390,42 +390,8 @@ public class CelShading {
         renderModel(model);
 
         glDisable(GL_STENCIL_TEST);
-
-
-//        glEnable(GL_CULL_FACE);
-//        glCullFace(GL_FRONT);
-//
-//        glPolygonMode(GL_BACK, GL_LINE); // Render the back faces as wireframes
-//        glColor3f(0.0f, 0.0f, 0.0f);
-//        glLineWidth(6.0f);  // Set the outline thickness
-//
-//        glColor3f(0.0f, 0.0f, 0.0f);  // Black color for the outline
-//
-//        glPushMatrix();
-//        glScalef(outlineScaleFactor, outlineScaleFactor, outlineScaleFactor);
-//
-//
-//        glBegin(GL_TRIANGLES);
-//        for (int[] face : model.faces) {
-//            // start of new code
-//            for (int i = 0; i < 3; i++) {
-//                int vertexIndex =  face[i * 3];
-//                if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
-//                    System.out.println("Invalid vertex index: " + vertexIndex);
-//                    continue;
-//                }
-//                float[] vertex = model.vertices.get(vertexIndex);
-//                glVertex3f(vertex[0], vertex[1], vertex[2]);
-//            }
-//
-//        }
-//
-//        glEnd();
-//        glPopMatrix();
-//
-//        glPolygonMode(GL_BACK, GL_FILL);  // Reset polygon mode
-//        glDisable(GL_CULL_FACE);
     }
+    //END OF CHANGED CODE
     //Franchesco
     public static void main(String[] args) {
         new CelShading().run();
@@ -548,38 +514,23 @@ public class CelShading {
         };
     }
 
-    private float dotProduct(float[] v1, float[] v2) {
-        return v1[0] * v2[0] + v1[1] * v2[1] + v2[2] * v2[2];
-    }
 
-    private void normalize(float[] vector) {
-        float length = (float) Math.sqrt(vector[0] * vector[0] +
-                                     vector[1] * vector[1] +
-                                     vector[2] * vector[2]);
-        if (length > 0) {
-            vector[0] /= length;
-            vector[1] /= length;
-            vector[2] /= length;
-        }
-    }
-
+    // SANDERS CODE JUST MOVED
     private void renderModelGeometry(Model model) {
-    glBegin(GL_TRIANGLES);
-    for (int[] face : model.faces) {
-        for (int i = 0; i < 3; i++) {
-            int vertexIndex = face[i * 3];
-            if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
-                System.out.println("Invalid vertex index: " + vertexIndex);
-                continue;
+        glBegin(GL_TRIANGLES);
+        for (int[] face : model.faces) {
+            for (int i = 0; i < 3; i++) {
+                int vertexIndex = face[i * 3];
+                if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
+                    System.out.println("Invalid vertex index: " + vertexIndex);
+                    continue;
+                }
+                float[] vertex = model.vertices.get(vertexIndex);
+                glVertex3f(vertex[0] * 1.01f, vertex[1] * 1.01f, vertex[2] * 1.01f); // Just draw the geometry
             }
-            float[] vertex = model.vertices.get(vertexIndex);
-            glVertex3f(vertex[0], vertex[1], vertex[2]); // Just draw the geometry
         }
+        glEnd();
     }
-    glEnd();
-}
-
-    // end of new code
 
 
 }
