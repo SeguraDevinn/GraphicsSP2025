@@ -130,7 +130,11 @@ public class CelShading {
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             setupCamera();
-            renderOutline(model);
+            // new/updated code
+            float[] cameraPos = {0.0f, 0.0f, 10.0f};
+            float thresholdAngle = 55.0f;
+            renderOutline(model, cameraPos, thresholdAngle);
+            // finished
 
             // Render the model with cel shading
             renderModel(model);
@@ -363,30 +367,51 @@ public class CelShading {
         float step = 1.0f / levels;
         return Math.round(intensity / step) * step;
     }
-    //Josh
-    public void renderOutline(Model model) {
+    //start of changed code(changed function passed variables)
+    public void renderOutline(Model model, float[] cameraPos, float thresholdAngle) {
         glDisable(GL_LIGHTING);  // Disable lighting for outline
 
         glPolygonMode(GL_BACK, GL_LINE); // Render the back faces as wireframes
-        glLineWidth(3.0f);  // Set the outline thickness
+        glLineWidth(6.0f);  // Set the outline thickness
 
         glColor3f(0.0f, 0.0f, 0.0f);  // Black color for the outline
 
         glBegin(GL_TRIANGLES);
         for (int[] face : model.faces) {
-            for (int i = 0; i < 3; i++) {
-                int vertexIndex = face[i * 3];
+            // start of new code
+             float[] faceNormal = calculateFaceNormal(model, face);
+             if (faceNormal == null) continue;
 
-                if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
-                    System.out.println("Invalid vertex index: " + vertexIndex);
-                    continue;
-                }
+             float[] faceCenter = getFaceCenter(model, face);
+             float[] viewDir = {
+                     cameraPos[0] - faceCenter[0],
+                     cameraPos[1] - faceCenter[1],
+                     cameraPos[2] - faceCenter[2]
+             };
 
-                float[] vertex = model.vertices.get(vertexIndex);
+             normalize(viewDir);
 
-                // Render the vertex with a slight offset (inflate the geometry)
-                glVertex3f(vertex[0] * 1.01f, vertex[1] * 1.01f, vertex[2] * 1.01f);
-            }
+             float dot = dotProduct(faceNormal, viewDir);
+
+             float angle = (float) Math.acos(dot) * (180.0f / (float) Math.PI);
+
+             if (angle > thresholdAngle){
+                 for (int i = 0; i < 3; i++) {
+                     int vertexIndex = face[i * 3];
+
+                     if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
+                         System.out.println("invalid vertex index: " + vertexIndex);
+                         continue;
+                     }
+
+                     float[] vertex = model.vertices.get(vertexIndex);
+
+
+                     float scaleFactor = 1.05f;
+                     glVertex3f(vertex[0] * scaleFactor, vertex[1] * 1.01f, vertex[2] * 1.01f);
+                 }
+             }
+
         }
         glEnd();
 
@@ -500,6 +525,35 @@ public class CelShading {
 
         return new Model(vertices, normals, faces);
     }
+
+    // start of new code
+    private float[] getFaceCenter(Model model, int[] face) {
+       float[] v0 = model.vertices.get(face[0]);
+        float[] v1 = model.vertices.get(face[3]);
+        float[] v2 = model.vertices.get(face[6]);
+
+        return new float[]{
+            (v0[0] + v1[0] + v2[0]) / 3.0f,
+            (v0[1] + v1[1] + v2[1]) / 3.0f,
+            (v0[2] + v1[2] + v2[2]) / 3.0f
+        };
+    }
+
+    private float dotProduct(float[] v1, float[] v2) {
+        return v1[0] * v2[0] + v1[1] * v2[1] + v2[2] * v2[2];
+    }
+
+    private void normalize(float[] vector) {
+        float length = (float) Math.sqrt(vector[0] * vector[0] +
+                                     vector[1] * vector[1] +
+                                     vector[2] * vector[2]);
+        if (length > 0) {
+            vector[0] /= length;
+            vector[1] /= length;
+            vector[2] /= length;
+        }
+    }
+    // end of new code
 
 
 }
