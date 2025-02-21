@@ -131,9 +131,9 @@ public class CelShading {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             setupCamera();
             // new/updated code
-            float[] cameraPos = {0.0f, 0.0f, 10.0f};
-            float thresholdAngle = 55.0f;
-            renderOutline(model, cameraPos, thresholdAngle);
+
+            float outlineScaleFactor = 1.05f;
+            renderOutline(model, outlineScaleFactor);
             // finished
 
             // Render the model with cel shading
@@ -285,7 +285,7 @@ public class CelShading {
     //Devinn
     public void renderModel(Model model) {
         // Re-enable lighting and set flat shading mode
-        glEnable(GL_LIGHTING);
+        //glEnable(GL_LIGHTING);
         glShadeModel(GL_FLAT);
 
         glEnable(GL_DEPTH_TEST);
@@ -368,54 +368,61 @@ public class CelShading {
         return Math.round(intensity / step) * step;
     }
     //start of changed code(changed function passed variables)
-    public void renderOutline(Model model, float[] cameraPos, float thresholdAngle) {
-        glDisable(GL_LIGHTING);  // Disable lighting for outline
+    public void renderOutline(Model model, float outlineScaleFactor) {
+        //glDisable(GL_LIGHTING);  // Disable lighting for outline
+        glEnable(GL_STENCIL_TEST);
+        glClear(GL_STENCIL_BUFFER_BIT);
 
-        glPolygonMode(GL_BACK, GL_LINE); // Render the back faces as wireframes
-        glLineWidth(6.0f);  // Set the outline thickness
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glDisable(GL_DEPTH_TEST);
 
-        glColor3f(0.0f, 0.0f, 0.0f);  // Black color for the outline
+        glColor3f(0.0f, 0.0f, 0.0f);  // Black color for outline
+        glPushMatrix();
+        glScalef(outlineScaleFactor, outlineScaleFactor, outlineScaleFactor);  // Slightly scale up
+        renderModelGeometry(model);
+        glPopMatrix();
 
-        glBegin(GL_TRIANGLES);
-        for (int[] face : model.faces) {
-            // start of new code
-             float[] faceNormal = calculateFaceNormal(model, face);
-             if (faceNormal == null) continue;
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glEnable(GL_DEPTH_TEST);
+        renderModel(model);
 
-             float[] faceCenter = getFaceCenter(model, face);
-             float[] viewDir = {
-                     cameraPos[0] - faceCenter[0],
-                     cameraPos[1] - faceCenter[1],
-                     cameraPos[2] - faceCenter[2]
-             };
-
-             normalize(viewDir);
-
-             float dot = dotProduct(faceNormal, viewDir);
-
-             float angle = (float) Math.acos(dot) * (180.0f / (float) Math.PI);
-
-             if (angle > thresholdAngle){
-                 for (int i = 0; i < 3; i++) {
-                     int vertexIndex = face[i * 3];
-
-                     if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
-                         System.out.println("invalid vertex index: " + vertexIndex);
-                         continue;
-                     }
-
-                     float[] vertex = model.vertices.get(vertexIndex);
+        glDisable(GL_STENCIL_TEST);
 
 
-                     float scaleFactor = 1.05f;
-                     glVertex3f(vertex[0] * scaleFactor, vertex[1] * 1.01f, vertex[2] * 1.01f);
-                 }
-             }
-
-        }
-        glEnd();
-
-        glPolygonMode(GL_BACK, GL_FILL);  // Reset polygon mode
+//        glEnable(GL_CULL_FACE);
+//        glCullFace(GL_FRONT);
+//
+//        glPolygonMode(GL_BACK, GL_LINE); // Render the back faces as wireframes
+//        glColor3f(0.0f, 0.0f, 0.0f);
+//        glLineWidth(6.0f);  // Set the outline thickness
+//
+//        glColor3f(0.0f, 0.0f, 0.0f);  // Black color for the outline
+//
+//        glPushMatrix();
+//        glScalef(outlineScaleFactor, outlineScaleFactor, outlineScaleFactor);
+//
+//
+//        glBegin(GL_TRIANGLES);
+//        for (int[] face : model.faces) {
+//            // start of new code
+//            for (int i = 0; i < 3; i++) {
+//                int vertexIndex =  face[i * 3];
+//                if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
+//                    System.out.println("Invalid vertex index: " + vertexIndex);
+//                    continue;
+//                }
+//                float[] vertex = model.vertices.get(vertexIndex);
+//                glVertex3f(vertex[0], vertex[1], vertex[2]);
+//            }
+//
+//        }
+//
+//        glEnd();
+//        glPopMatrix();
+//
+//        glPolygonMode(GL_BACK, GL_FILL);  // Reset polygon mode
+//        glDisable(GL_CULL_FACE);
     }
     //Franchesco
     public static void main(String[] args) {
@@ -553,6 +560,23 @@ public class CelShading {
             vector[2] /= length;
         }
     }
+
+    private void renderModelGeometry(Model model) {
+    glBegin(GL_TRIANGLES);
+    for (int[] face : model.faces) {
+        for (int i = 0; i < 3; i++) {
+            int vertexIndex = face[i * 3];
+            if (vertexIndex < 0 || vertexIndex >= model.vertices.size()) {
+                System.out.println("Invalid vertex index: " + vertexIndex);
+                continue;
+            }
+            float[] vertex = model.vertices.get(vertexIndex);
+            glVertex3f(vertex[0], vertex[1], vertex[2]); // Just draw the geometry
+        }
+    }
+    glEnd();
+}
+
     // end of new code
 
 
