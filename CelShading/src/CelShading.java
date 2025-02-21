@@ -236,6 +236,8 @@ public class CelShading {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
+        glShadeModel(GL_SMOOTH);
+
         // Configure OpenGL to use the vertex colors for lighting calculations
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
@@ -286,7 +288,7 @@ public class CelShading {
     public void renderModel(Model model) {
         // Re-enable lighting and set flat shading mode
         //glEnable(GL_LIGHTING);
-        glShadeModel(GL_FLAT);
+        glShadeModel(GL_SMOOTH);
 
         glEnable(GL_DEPTH_TEST);
 
