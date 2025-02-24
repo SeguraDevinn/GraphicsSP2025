@@ -371,7 +371,6 @@ public class CelShading {
     }
     //start of changed code(changed function passed variables)
     public void renderOutline(Model model, float outlineScaleFactor) {
-
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
 
