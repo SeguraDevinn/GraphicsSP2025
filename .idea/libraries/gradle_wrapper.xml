@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="gradle-wrapper">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/CelShading/lib/lwjgl-release-3.3.6-custom" />
+      <root url="file://$PROJECT_DIR$/OpenGLProjects/lib/lwjgl-release-3.3.6-custom" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/CelShading/lib/lwjgl-release-3.3.6-custom" />
+      <root url="file://$PROJECT_DIR$/OpenGLProjects/lib/lwjgl-release-3.3.6-custom" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/CelShading/lib/lwjgl-release-3.3.6-custom" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/CelShading/lib/lwjgl-release-3.3.6-custom" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$PROJECT_DIR$/OpenGLProjects/lib/lwjgl-release-3.3.6-custom" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/OpenGLProjects/lib/lwjgl-release-3.3.6-custom" recursive="false" type="SOURCES" />
   </library>
 </component>

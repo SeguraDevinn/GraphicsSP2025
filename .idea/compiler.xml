@@ -2,7 +2,7 @@
 <project version="4">
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="CelShading" options="--add-exports java.rmi/sun.rmi.transport=ALL-UNNAMED" />
+      <module name="OpenGLProjects" options="--add-exports java.rmi/sun.rmi.transport=ALL-UNNAMED" />
     </option>
   </component>
 </project>

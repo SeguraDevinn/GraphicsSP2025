@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CelShading/CelShading.iml" filepath="$PROJECT_DIR$/CelShading/CelShading.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CubeSpinning/CubeSpinning.iml" filepath="$PROJECT_DIR$/CubeSpinning/CubeSpinning.iml" />
       <module fileurl="file://$PROJECT_DIR$/Graphics.iml" filepath="$PROJECT_DIR$/Graphics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OpenGLProjects/OpenGLProjects.iml" filepath="$PROJECT_DIR$/OpenGLProjects/OpenGLProjects.iml" />
       <module fileurl="file://$PROJECT_DIR$/RAYTRACING/src/RAYTRACING.iml" filepath="$PROJECT_DIR$/RAYTRACING/src/RAYTRACING.iml" />
       <module fileurl="file://$PROJECT_DIR$/TextureMapping/TextureMapping.iml" filepath="$PROJECT_DIR$/TextureMapping/TextureMapping.iml" />
     </modules>
