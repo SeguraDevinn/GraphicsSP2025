@@ -1,3 +1,5 @@
+//  javac -classpath "lib/lwjgl-release-3.3.6-custom/*" src/CubeSpinner.java
+//  java -XstartOnFirstThread \-Djava.library.path="lib/lwjgl-release-3.3.6-custom" \-classpath "lib/lwjgl-release-3.3.6-custom/*:src" \CubeSpinner
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
