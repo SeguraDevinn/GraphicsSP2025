@@ -1,3 +1,5 @@
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -5,15 +7,54 @@ import java.util.List;
 import java.util.Random;
 
 public class FluidSimulation {
-    public static void main(String[] args) {
 
+    private long window;
+    private int width = 800;
+    private int height = 600;
+
+    private float panTiltX = 0;
+    private float panTiltZ = 0;
+
+    private float tiltSpeed = 0.5f;
+    private float maxTilt = 30.0f;
+
+    private Water water;
+    public static void main(String[] args) {
+        new FluidSimulation().run();
     }
 
     public void run() {
+        init();
+        loop();
+        GLFW.glfwDestroyWindow(window);
+        GLFW.glfwTerminate();
 
     }
-    private void init() {
 
+    private void init() {
+        GLFW.glfwInit();
+        window = GLFW.glfwCreateWindow(width, height, "Cake Pan With Water Simulation", 0, 0);
+        GLFW.glfwMakeContextCurrent(window);
+        GL.createCapabilities();
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glClearColor(0.0f, 0.0f,1.0f,1.0f);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(-10,10,-10,10,0.01f,100.0f);
+        GL11.glMatrixMode(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_LIGHT0);
+
+        float[] lightPosition = {0.0f, 5.0f, 10.0f, 1.0f};
+        float[] lightAmbient = {0.2f, 0.2f, 0.2f, 1.0f};
+        float[] lightDiffuse = {0.8f, 0.8f, 0.8f, 1.0f};
+
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_POSITION,lightPosition);
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_AMBIENT,lightPosition);
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE,lightPosition);
+
+        GL11.glShadeModel(GL11.GL_SMOOTH);
+
+        water = new Water(500);
     }
 
     private void loop() {
@@ -21,6 +62,7 @@ public class FluidSimulation {
     }
 
     private void updatePanTilt() {
+
 
     }
 
