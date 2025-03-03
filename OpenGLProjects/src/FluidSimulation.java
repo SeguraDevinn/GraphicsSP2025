@@ -64,9 +64,60 @@ public class FluidSimulation {
     private void updatePanTilt() {
 
 
+
     }
 
     private void renderPan() {
+        GL11.glPushMatrix();
+        GL11.glRotatef(panTiltX, 1, 0, 0);
+        GL11.glRotatef(panTiltZ, 0, 0, 1);
+
+        // Set material properties for the pan
+        float[] materialAmbient = {0.3f, 0.3f, 0.3f, 1.0f};
+        float[] materialDiffuse = {0.6f, 0.6f, 0.6f, 1.0f};
+        GL11.glMaterialfv(GL11.GL_FRONT, GL11.GL_AMBIENT, materialAmbient);
+        GL11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse);
+
+        // Draw the bottom of the cake pan (rectangle)
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glNormal3f(0, 1, 0); // Normal facing upwards
+        GL11.glVertex3f(-4, 0, -4);
+        GL11.glVertex3f(4, 0, -4);
+        GL11.glVertex3f(4, 0, 4);
+        GL11.glVertex3f(-4, 0, 4);
+        GL11.glEnd();
+
+        // Draw the walls of the cake pan (4 sides)
+        GL11.glBegin(GL11.GL_QUADS);
+
+        // Left side
+        GL11.glNormal3f(-1, 0, 0); // Normal facing left
+        GL11.glVertex3f(-4, 0, -4);
+        GL11.glVertex3f(-4, 0, 4);
+        GL11.glVertex3f(-4, 2, 4);
+        GL11.glVertex3f(-4, 2, -4);
+
+        GL11.glNormal3f(1, 0, 0); // Normal facing right
+        GL11.glVertex3f(4, 0, -4);
+        GL11.glVertex3f(4, 0, 4);
+        GL11.glVertex3f(4, 2, 4);
+        GL11.glVertex3f(4, 2, -4);
+        // Front side
+        GL11.glNormal3f(0, 0, 1); // Normal facing front
+        GL11.glVertex3f(-4, 0, 4);
+        GL11.glVertex3f(4, 0, 4);
+        GL11.glVertex3f(4, 2, 4);
+        GL11.glVertex3f(-4, 2, 4);
+        // Back side i
+        GL11.glNormal3f(0, 0, -1); // Normal facing back
+        GL11.glVertex3f(-4, 0, -4);
+        GL11.glVertex3f(4, 0, -4);
+        GL11.glVertex3f(4, 2, -4);
+        GL11.glVertex3f(-4, 2, -4);
+
+        GL11.glEnd();
+        GL11.glPopMatrix();
+
 
     }
 
