@@ -176,7 +176,7 @@ class Particle {
     private float gravity = -9.18f;
     private float damping = 0.85f;
     private float panBoundary = 4.0f;
-    private float outOfBoundsThreshold;
+    private float outOfBoundsThreshold = 6.0f;
     private Random random = new Random();
 
     private float repulsionRadius = 0.5f;
