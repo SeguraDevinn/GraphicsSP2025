@@ -61,9 +61,28 @@ public class FluidSimulation {
 
     }
 
-    private void updatePanTilt() {
+    private void updatePanTilt()
+    {
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS)
+        {
+            panTiltZ = Math.max(panTiltZ + tiltSpeed, maxTilt); // // tilt left
+        }
+        else if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS)
+        {
+            panTiltZ = Math.min(panTiltZ - tiltSpeed, -maxTilt); // tilt right
+        }
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS)
+        {
+            panTiltX = Math.max(panTiltX - tiltSpeed, -maxTilt); // tilt forward
+        }
+        else if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS)
+        {
+            panTiltX = Math.min(panTiltX + tiltSpeed, maxTilt); // tilt backward
+        }
 
-
+        // decay tilt back to center over time
+        panTiltX *= 0.98f;
+        panTiltZ *= 0.98f;
 
     }
 
