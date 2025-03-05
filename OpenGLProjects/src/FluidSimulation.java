@@ -233,10 +233,10 @@ class Particle {
         vy += gravity * 0.01f;
 
         float tiltForceX = -(float) Math.sin(Math.toRadians(tiltZ));
-        float tiltForcez = -(float) Math.sin(Math.toRadians(tiltX));
+        float tiltForceZ = (float) Math.sin(Math.toRadians(tiltX));
 
         vx += tiltForceX * 0.02f;
-        vz += tiltForcez * 0.02f;
+        vz += tiltForceZ * 0.02f;
 
         x *= vx * 0.01f;
         y *= vy * 0.01f;
