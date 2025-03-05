@@ -1,3 +1,6 @@
+// javac -classpath "lib/lwjgl-release-3.3.6-custom/*" src/FluidSimulation.java
+// java -XstartOnFirstThread \-Djava.library.path="lib/lwjgl-release-3.3.6-custom" \-classpath "lib/lwjgl-release-3.3.6-custom/*:src" \FluidSimulation
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -58,6 +61,26 @@ public class FluidSimulation {
     }
 
     private void loop() {
+        while (!GLFW.glfwWindowShouldClose(window)) {
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+            GL11.glLoadIdentity();
+
+            // set camera perspective
+            GL11.glTranslatef(0, -4, -16);
+            GL11.glRotatef(45, 1, 0, 0);
+
+            // update pan tilt
+            updatePanTilt();
+
+            // render pan and water
+            renderPan();
+            water.update(panTiltX, panTiltZ); // pass current pan tilt to the water simulation
+            water.render();
+
+            // swap buffers and poll events
+            GLFW.glfwSwapBuffers(window);
+            GLFW.glfwPollEvents();
+        }
 
     }
 
