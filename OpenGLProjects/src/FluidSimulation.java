@@ -15,11 +15,11 @@ public class FluidSimulation {
     private int width = 800;
     private int height = 600;
 
-    private float panTiltX = 0;
-    private float panTiltZ = 0;
+    private float panTiltX = 0; // forward and backward tilt
+    private float panTiltZ = 0; // left and right tilt
 
     private float tiltSpeed = 0.5f;
-    private float maxTilt = 30.0f;
+    private float maxTilt = 30.0f; // maximum tilt angle
 
     private Water water;
     public static void main(String[] args) {
@@ -34,7 +34,8 @@ public class FluidSimulation {
 
     }
 
-    private void init() {
+    private void init()
+    {
         GLFW.glfwInit();
         window = GLFW.glfwCreateWindow(width, height, "Cake Pan With Water Simulation", 0, 0);
         GLFW.glfwMakeContextCurrent(window);
@@ -44,7 +45,10 @@ public class FluidSimulation {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         GL11.glOrtho(-10,10,-10,10,0.01f,100.0f);
-        GL11.glMatrixMode(GL11.GL_LIGHTING);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+        // enable lighting
+        GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_LIGHT0);
 
         float[] lightPosition = {0.0f, 5.0f, 10.0f, 1.0f};
@@ -52,8 +56,8 @@ public class FluidSimulation {
         float[] lightDiffuse = {0.8f, 0.8f, 0.8f, 1.0f};
 
         GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_POSITION,lightPosition);
-        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_AMBIENT,lightPosition);
-        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE,lightPosition);
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_AMBIENT, lightAmbient);
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, lightDiffuse);
 
         GL11.glShadeModel(GL11.GL_SMOOTH);
 
