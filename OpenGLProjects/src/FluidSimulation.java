@@ -167,9 +167,6 @@ public class FluidSimulation {
 
     }
 
-
-
-
 }
 
 class Particle {
@@ -228,7 +225,8 @@ class Particle {
         return ret;
     }
 
-    public void update(float tiltX, float tiltZ) {
+    public void update(float tiltX, float tiltZ)
+    {
 
         vy += gravity * 0.01f;
 
@@ -238,16 +236,17 @@ class Particle {
         vx += tiltForceX * 0.02f;
         vz += tiltForceZ * 0.02f;
 
-        x *= vx * 0.01f;
-        y *= vy * 0.01f;
-        z *= vz * 0.01f;
+        x += vx * 0.01f;
+        y += vy * 0.01f;
+        z += vz * 0.01f;
 
         y = cakePanPosition(x, z, tiltX, tiltZ);
 
         vx *= 0.99f;
         vz *= 0.99f;
 
-        if (Math.abs(x) > panBoundary || Math.abs(z) > panBoundary) {
+        if (Math.abs(x) > panBoundary || Math.abs(z) > panBoundary)
+        {
             if (Math.abs(x) > panBoundary) {
                 vx = -vx * damping + (random.nextFloat() - 0.5f) * 0.05f;
                 x = Math.signum(x) * panBoundary;
@@ -282,18 +281,21 @@ class Water {
     }
 
     public void update(float tiltX, float tiltZ) {
-        for (int i = 0; i < particles.size();i++) {
+        for (int i = 0; i < particles.size(); i++)
+        {
             for (int j = i + 1; j < particles.size(); j++) {
                 particles.get(i).applyRepulsion(particles.get(j));
                 particles.get(j).applyRepulsion(particles.get(i));
             }
         }
 
-        for (int i = particles.size() - 1; i >= 0;i--) {
+        for (int i = particles.size() - 1; i >= 0; i--)
+        {
             Particle particle = particles.get(i);
             particle.update(tiltX, tiltZ);
 
-            if (particle.isOutOfBounds) {
+            if (particle.isOutOfBounds)
+            {
                 particles.remove(i);
             }
         }
