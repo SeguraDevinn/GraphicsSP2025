@@ -40,8 +40,8 @@ public class FluidSimulation {
         GL.createCapabilities();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-        // Set clear color to white
-        GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // RGBA, where each component is between 0.0 and 1.0
+        
+        GL11.glClearColor(0.0f, 0.0f, 1.0f, 0.5f); // RGBA, where each component is between 0.0 and 1.0
 
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
