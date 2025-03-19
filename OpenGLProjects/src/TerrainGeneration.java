@@ -87,6 +87,49 @@ public class TerrainGeneration
         return normals;
     }
 
+    //saves the generated heightmap into Wavefront .obj file with normals
+    private static void saveToObjFile(String fileName, float[][] heightMap) throws IOException {
+        int size = heightMap.length;
+        float[][][] normals = calculateNormals(heightMap);
+
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))){
+            //writing vertices
+            for (int z = 0; z < size; z++) {
+                for (int x = 0; x < size; x++) {
+                    writer.write("v " + x + " " + heightMap[x][z] + " " + z + "\n");
+                }
+            }
+
+            //writing normals
+            for (int z = 0; z < size;z++) {
+                for (int x = 0; x < size; x++) {
+                    float[] normal = normals[x][z];
+                    writer.write("vn " + normal[0] + " " + normal[1] + " " + normal[2] + "\n");
+                }
+            }
+
+            // write faces (triangle)
+            for (int z = 0; z < size; z++) {
+                for (int x = 0; x < size - 1; x++) {
+                    int topLeft = (z * size) + x + 1;
+                    int topRight = topLeft + 1;
+                    int bottomLeft = topLeft + size;
+                    int bottomRight = bottomLeft + 1;
+
+                    // writing faces with normals
+                    writer.write("f " + topLeft + "//" + topLeft +
+                            " " + bottomLeft + "//" + bottomLeft +
+                            " " + topRight + "//" + topRight + " " + "\n");
+                    writer.write("f " + topRight + "//" + topRight +
+                            " " + bottomLeft + "//" + bottomLeft +
+                            " " + bottomRight + "//" + bottomRight + "\n");
+                }
+            }
+        }
+    }
+
+
 }
 
 
