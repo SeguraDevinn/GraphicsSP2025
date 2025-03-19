@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -127,6 +128,17 @@ public class TerrainGeneration
                 }
             }
         }
+    }
+
+    static class SimplexNoise {
+        private static final int GRADIENT_SIZE_TABLE = 256;
+        private  static final float[] GRADIENTS_2D = new float[GRADIENT_SIZE_TABLE * 2];
+        private static final short[] PERM = new short[GRADIENT_SIZE_TABLE * 2];
+        private static final float SQRT3 = 1.7320508075688772f;
+        private static final float F2 = 0.5f * (SQRT3 - 1.0f);
+        private static final float G2 = (3.0f - SQRT3) / 6.0f;
+
+        /// Franchesco start after this
     }
 
 
