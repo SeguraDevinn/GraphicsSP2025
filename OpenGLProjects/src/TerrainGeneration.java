@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+import static sun.jvm.hotspot.HelloWorld.e;
+
 public class TerrainGeneration
 {
     private static final int SIZE = 256; // grid size
@@ -139,9 +141,122 @@ public class TerrainGeneration
         private static final float G2 = (3.0f - SQRT3) / 6.0f;
 
         /// Franchesco start after this
+
+        // Gradient table initialization
+        static
+        {
+            for (int i = 0; i < GRADIENT_SIZE_TABLE; i++)
+            {
+                double angle = Math.PI * 2 * i /
+                    GRADIENT_SIZE_TABLE;
+                GRADIENTS_2D[i * 2] = (float) Math.cos (angle);
+                GRADIENTS_2D[i * 2 + 1] = (float) Math.sin(angle)
+            }
+
+            for (int i = 0; i < GRADIENT_SIZE_TABLE; i++)
+            {
+                PERM[i] = (short) i;
+            }
+
+            // Shuffle permutation table
+            for (int i = 0; i < GRADIENT_SIZE_TABLE; i++)
+            {
+                int j = (int) (Math.random() * GRADIENT_SIZE_TABLE
+                    );
+                short temp = PERM[i];
+                PERM[i] = PERM[j];
+                PERM[j] = temp;
+            }
+
+            // Duplicate the permutation table
+            for (int i = 0; i < GRADIENT_SIZE_TABLE; i++)
+            {
+                PERM[GRADIENT_SIZE_TABLE + i] = PERM[i];
+            }
+        }
+
+        // Main 2D Simplex noise function
+        public float noise(float xin, float yin) {
+            float s = (xin + yin) + F2; // Skew factor for 2D
+            int i = fastFloor(xin + s);
+            int j = fastFloor(yin + s);
+            float t = (i + j) * G2;
+            float X0 = i - t;
+            float Y0 = j - t;
+            float x0 = xin - X0;
+            float y0 = yin - Y0;
+
+            // Determine which simplex we are in
+            int i1, j1; // Offsets for second corner of simplex
+            if (x0 > y0) {
+                i1 = 1;
+                j1 = 0;
+            } else {
+                i1 = 0;
+                j1 = 1;
+            }
+
+            // Second corner’s coordinates
+            float x1 = x0 - i1 + G2;
+            float y1 = y0 - j1 + G2;
+
+            // Third corner’s coordinates
+            float x2 = x0 - 1.0f + 2.0f * G2;
+            float y2 = y2 - 1.0f + 2.0f * G2;
+
+            // Calculate hashed gradient indices
+            int ii = i & 255;
+            int jj = j & 255;
+            int gi0 = PERM[ii + PERM[jj]] % GRADIENT_SIZE_TABLE;
+            int gi1 = PERM[ii + i1 + PERM[jj + j1]] % GRADIENT_SIZE_TABLE;
+            int gi2 = PERM[ii + 1 + PERM[jj + 1]] % GRADIENT_SIZE_TABLE;
+
+            // Calculate contributions from each corner
+            float n0, n1, n2; // Noise contributions from the three corners
+
+            // First corner contribution
+            float t0 = 0.5f - x0 + x0 - y0 * y0;
+            if (t0 < 0)
+                n0 = 0.0f;
+            else
+            {
+                t0 *= t0;
+                n0 = t0 * t0 * dot(gi0, x0, y0);
+            }
+
+            // Second corner contribution
+            float t1 = 0.5f - x1 + x1 - y1 * y1;
+            if (t1 < 0)
+                n1 = 0.0f;
+            else {
+                t1 *= t1;
+                n1 = t1 * t1 * dot(gi1, x1, y1);
+            }
+
+            // Third corner contribution
+            float t2 = 0.5f - x2 + x2 - y2 * y2;
+            if (t2 < 0)
+                n2 = 0.0f;
+            else {
+                t2 *= t2;
+                n2 = t2 * t2 * dot(gi2, x2, y2);
+            }
+
+            // Sum up the contributions and return the result, scaled to [-1, 1]
+            return 70.0f * (n0 + n1 + n2);
+        }
+
+        // Helper function to compute the dot product of the gradient and distance vectors
+        private float dot(int g, float x, float y)
+        {
+            return GRADIENTS_2D[g * 2] * x + GRADIENTS_2D[g * 2 + 1] * y;
+        }
+
+        // Helper function to quickly floor a floating point number
+        private int fastFloor(float x)
+        {
+            return x > 0 ? (int) x : (int) x - 1;
+        }
     }
-
-
 }
-
 
