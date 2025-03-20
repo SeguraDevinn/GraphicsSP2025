@@ -1,10 +1,11 @@
+//javac -classpath "lib/lwjgl-release-3.3.6-custom/*" src/TerrainGeneration.java
+//java -XstartOnFirstThread \-Djava.library.path="lib/lwjgl-release-3.3.6-custom" \-classpath "lib/lwjgl-release-3.3.6-custom/*:src" \TerrainGeneration
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-import static sun.jvm.hotspot.HelloWorld.e;
 
 public class TerrainGeneration
 {
@@ -12,6 +13,49 @@ public class TerrainGeneration
     private static final float SCALE = 50f; // controls steepness
     private static final float ROUGHNESS = 0.5f; // determines fractal variation
 
+    /// Start of new code
+
+    private static final float[][] originalHeightMap = generateHeightMap(SIZE, SCALE, ROUGHNESS);
+    private static float[][] heightMap = generateHeightMap(SIZE, SCALE, ROUGHNESS);
+
+    public static void updateTerrain(float heightMultiplier, String mode) {
+        if (mode.equals("flatten")) {
+            System.out.println("Flattening terrain...");
+            for (int x = 0; x < SIZE; x++) {
+                for (int z = 0; z < SIZE; z++) {
+                    heightMap[x][z] = 0;
+                }
+            }
+        } else if (mode.equals("reset")) {
+            System.out.println("Resetting terrain to original...");
+            heightMap = copyHeightMap(originalHeightMap);
+        } else if (mode.equals("update")) {
+            System.out.println("Updating terrain with new height scale...");
+            for (int x = 0; x < SIZE; x++) {
+                for (int z = 0; z < SIZE; z++) {
+                    heightMap[x][z] = originalHeightMap[x][z] * heightMultiplier;
+                }
+            }
+        }
+
+        // Save modified terrain
+        try {
+            saveToObjFile("fractal_terrain.obj", heightMap);
+            System.out.println("Terrain updated and saved.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static float[][] copyHeightMap(float[][] source) {
+        float[][] copy = new float[SIZE][SIZE];
+        for (int x = 0; x < SIZE; x++) {
+            System.arraycopy(source[x], 0, copy[x], 0, SIZE);
+        }
+        return copy;
+    }
+
+    /// end of new code
     public static void main(String[] args)
     {
         float[][] heightMap = generateHeightMap(SIZE, SCALE, ROUGHNESS);
@@ -27,7 +71,7 @@ public class TerrainGeneration
     }
 
     // generate a fractal heightmap using Simplex noise
-    private static float [][] generateHeightMap(int size, float scale, float roughness)
+    private static float [][] generateHeightMap(int size, float scale, float heightMultiplier)
     {
         float[][] heightMap = new float[size][size];
         Random random = new Random();
@@ -39,7 +83,7 @@ public class TerrainGeneration
             {
                 float nx = x / (float) size - 0.5f;
                 float nz = z / (float) size - 0.5f;
-                heightMap[x][z] = noise.noise(nx * scale, nz * scale) * roughness;
+                heightMap[x][z] = noise.noise(nx * scale, nz * scale) * heightMultiplier;
             }
         }
         return heightMap;
@@ -113,7 +157,7 @@ public class TerrainGeneration
             }
 
             // write faces (triangle)
-            for (int z = 0; z < size; z++) {
+            for (int z = 0; z < size - 1; z++) {
                 for (int x = 0; x < size - 1; x++) {
                     int topLeft = (z * size) + x + 1;
                     int topRight = topLeft + 1;
@@ -123,7 +167,7 @@ public class TerrainGeneration
                     // writing faces with normals
                     writer.write("f " + topLeft + "//" + topLeft +
                             " " + bottomLeft + "//" + bottomLeft +
-                            " " + topRight + "//" + topRight + " " + "\n");
+                            " " + topRight + "//" + topRight + "\n");
                     writer.write("f " + topRight + "//" + topRight +
                             " " + bottomLeft + "//" + bottomLeft +
                             " " + bottomRight + "//" + bottomRight + "\n");
@@ -149,8 +193,8 @@ public class TerrainGeneration
             {
                 double angle = Math.PI * 2 * i /
                     GRADIENT_SIZE_TABLE;
-                GRADIENTS_2D[i * 2] = (float) Math.cos (angle);
-                GRADIENTS_2D[i * 2 + 1] = (float) Math.sin(angle)
+                GRADIENTS_2D[i * 2] = (float) Math.cos(angle);
+                GRADIENTS_2D[i * 2 + 1] = (float) Math.sin(angle);
             }
 
             for (int i = 0; i < GRADIENT_SIZE_TABLE; i++)
@@ -177,7 +221,7 @@ public class TerrainGeneration
 
         // Main 2D Simplex noise function
         public float noise(float xin, float yin) {
-            float s = (xin + yin) + F2; // Skew factor for 2D
+            float s = (xin + yin) * F2; // Skew factor for 2D
             int i = fastFloor(xin + s);
             int j = fastFloor(yin + s);
             float t = (i + j) * G2;
@@ -202,7 +246,7 @@ public class TerrainGeneration
 
             // Third corner’s coordinates
             float x2 = x0 - 1.0f + 2.0f * G2;
-            float y2 = y2 - 1.0f + 2.0f * G2;
+            float y2 = y0 - 1.0f + 2.0f * G2;
 
             // Calculate hashed gradient indices
             int ii = i & 255;
@@ -215,7 +259,7 @@ public class TerrainGeneration
             float n0, n1, n2; // Noise contributions from the three corners
 
             // First corner contribution
-            float t0 = 0.5f - x0 + x0 - y0 * y0;
+            float t0 = 0.5f - x0 * x0 - y0 * y0;
             if (t0 < 0)
                 n0 = 0.0f;
             else
@@ -225,7 +269,7 @@ public class TerrainGeneration
             }
 
             // Second corner contribution
-            float t1 = 0.5f - x1 + x1 - y1 * y1;
+            float t1 = 0.5f - x1 * x1 - y1 * y1;
             if (t1 < 0)
                 n1 = 0.0f;
             else {
@@ -234,7 +278,7 @@ public class TerrainGeneration
             }
 
             // Third corner contribution
-            float t2 = 0.5f - x2 + x2 - y2 * y2;
+            float t2 = 0.5f - x2 * x2 - y2 * y2;
             if (t2 < 0)
                 n2 = 0.0f;
             else {
