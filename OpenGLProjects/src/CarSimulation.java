@@ -5,8 +5,11 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org .lwjgl.opengl.GL15;
@@ -151,11 +154,64 @@ class Car {
 }
 
 class OBJLoader {
-    public static Model loadModel(String fileName) throws IOException {
+    public static Model loadModel(String fileName) throws IOException
+    {
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String line;
+        List<Float> vertices = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
+        List<int[]> faces = new ArrayList<>();
+        while ((line = reader.readLine()) != null)
+        {
+            String[] parts = line.split("\\s+");
+            if (tokens[0].equals("v"))
+            {
+                float[] vertex = {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
+                vertices.add(vertex[0]);
+            }
+            else if (tokens[0].equals("vn"))
+            {
+                float[] normal = {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
+                normals.add(normal);
+            }
+            else if (tokens[0].equals("f"))
+            {
+                int[] face = {Integer.parseInt(tokens[1].split ("/")[0]) - 1, Integer.parseInt(tokens[2].split ("/")[0]) - 1, Integer.parseInt(tokens[3].split ("/")[0]) - 1};
+                faces.add(face);
+            }
+        }
 
+        float[] verticesArray = new float[vertices.size() * 3];
+        float[] normalsArray = new float[normals.size() * 3];
+        int[] indicesArray = new int[faces.size() * 3];
+
+        int vertexIndex = 0;
+        for (float[] vertex : vertices)
+        {
+            verticesArray[vertexIndex++] = vertex[0];
+            verticesArray[vertexIndex++] = vertex[1];
+            verticesArray[vertexIndex++] = vertex[2];
+        }
+
+        int normalIndex = 0;
+        for (float[] normal : normals)
+        {
+            normalsArray[normalIndex++] = normal[0];
+            normalsArray[normalIndex++] = normal[1];
+            normalsArray[normalIndex++] = normal[2];
+        }
+
+        int faceIndex = 0;
+        for (int[] face : faces)
+        {
+            indicesArray[faceIndex++] = face[0];
+            indicesArray[faceIndex++] = face[1];
+            indicesArray[faceIndex++] = face[2];
+        }
+
+        reader.close();
+        return new Model(verticesArray, normalsArray, indicesArray);
     }
-
-
 }
 
 class Model {
