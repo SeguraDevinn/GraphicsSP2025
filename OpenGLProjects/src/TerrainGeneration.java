@@ -1,5 +1,6 @@
 //javac -classpath "lib/lwjgl-release-3.3.6-custom/*" src/TerrainGeneration.java
 //java -XstartOnFirstThread \-Djava.library.path="lib/lwjgl-release-3.3.6-custom" \-classpath "lib/lwjgl-release-3.3.6-custom/*:src" \TerrainGeneration
+
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
