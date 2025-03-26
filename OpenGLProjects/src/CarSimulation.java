@@ -359,7 +359,7 @@ class Car {
         FloatBuffer carBodySpecular = BufferUtils.createFloatBuffer(4).put(new float[] {0.9f, 0.9f, 0.9f, 1.0f});
         carBodySpecular.flip();
         GL11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, carBodySpecular);
-        GL11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, 64.0f) // high shininness for car body
+        GL11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, 64.0f); // high shininness for car body
 
         float length = 4.0f;
         float width = 2.0f;
@@ -507,16 +507,16 @@ class OBJLoader {
     {
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         String line;
-        List<Float> vertices = new ArrayList<>();
-        List<Float> normals = new ArrayList<>();
+        List<float[]> vertices = new ArrayList<>();
+        List<float[]> normals = new ArrayList<>();
         List<int[]> faces = new ArrayList<>();
         while ((line = reader.readLine()) != null)
         {
-            String[] parts = line.split("\\s+");
+            String[] tokens = line.split("\\s+");
             if (tokens[0].equals("v"))
             {
                 float[] vertex = {Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])};
-                vertices.add(vertex[0]);
+                vertices.add(vertex);
             }
             else if (tokens[0].equals("vn"))
             {
@@ -580,7 +580,7 @@ class Terrain {
 
     }
 
-    public float getTerrainHeight(float x, float z) {
+    public float getTerrainHeightAt(float x, float z) {
         return 0.0f;
     }
 
