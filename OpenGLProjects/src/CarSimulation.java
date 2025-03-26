@@ -567,17 +567,84 @@ class Model {
     private float[] vertices;
     private float[] normals;
     private int[] indices;
+
+    public Model(float[] vertices, float[] normals, int[] indices)
+    {
+        this.vertices = vertices;
+        this.normals = normals;
+        this.indices = indices;
+    }
+
+    public float[] getVertices()
+    {
+        return vertices;
+    }
+
+    public float[] getNormals()
+    {
+        return normals;
+    }
+
+    public int[] getIndices()
+    {
+        return indices;
+    }
 }
 
 class Terrain {
     private Model model;
 
-    public Terrain(String objFilePath) {
-
+    public Terrain(String objFilePath)
+    {
+        try
+        {
+            this.model = OBJLoader.loadModel(objFilePath);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    public void render() {
+    public void render()
+    {
+        GL11.glColor3f(0.3f, 0.8f, 0.3f);
+        GL11.glShadeModel(GL11.GL_SMOOTH);
 
+        FloatBuffer terrainAmbient = BufferUtils.createFloatBuffer(4).put(new float[] {0.6f, 0.8f, 0.6f, 1.0f});
+        FloatBuffer terrainDiffuse = BufferUtils.createFloatBuffer(4).put(new float[] {0.7f, 0.9f, 0.7f, 1.0f});
+        FloatBuffer terrainSpecular = BufferUtils.createFloatBuffer(4).put(new float[] {0.2f, 0.2f, 0.2f, 1.0f});
+
+        terrainAmbient.flip();
+        terrainDiffuse.flip();
+        terrainSpecular.flip();
+
+        GL11.glMaterialfv(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT, terrainAmbient);
+        GL11.glMaterialfv(GL11.GL_FRONT_AND_BACK, GL11.GL_DIFFUSE, terrainDiffuse);
+        GL11.glMaterialfv(GL11.GL_FRONT_AND_BACK, GL11.GL_SPECULAR, terrainSpecular);
+        GL11.glMaterialf(GL11.GL_FRONT_AND_BACK, GL11.GL_SHININESS, 10.0f);
+
+        float[] vertices = model.getVertices();
+        float[] normals = model.getNormals();
+        int[] indices = model.getIndices();
+
+        GL11.glBegin(GL11.GL_TRIANGLES);
+        for (int i = 0; i < vertices.length; i += 3)
+        {
+            int vIndex1 = indices[i] * 3;
+            int vIndex2 = indices[i + 1] * 3;
+            int vIndex3 = indices[i + 2] * 3;
+
+            GL11.glNormal3f(normals[vIndex1], normals[vIndex1 + 1], normals[vIndex1 + 2]);
+            GL11.glVertex3f(vertices[vIndex1], vertices[vIndex1 + 1], vertices[vIndex1 + 2]);
+
+            GL11.glNormal3f(normals[vIndex2], normals[vIndex2 + 1], normals[vIndex2 + 2]);
+            GL11.glVertex3f(vertices[vIndex2], vertices[vIndex2 + 1], vertices[vIndex2 + 2]);
+
+            GL11.glNormal3f(normals[vIndex3], normals[vIndex3 + 1], normals[vIndex3 + 2]);
+            GL11.glVertex3f(vertices[vIndex3], vertices[vIndex3 + 1], vertices[vIndex3 + 2]);
+        }
+        GL11.glEnd();
     }
 
     public float getTerrainHeightAt(float x, float z) {
@@ -585,8 +652,16 @@ class Terrain {
     }
 
     private boolean isPointInTriangle(float px, float pz, float v1X, float v1Z,
-                                      float v2X, float v2z,
-                                      float v3X, float v3z) {
+                                      float v2X, float v2Z,
+                                      float v3X, float v3Z) {
+        float d1 = sign(px, pz, v1X, v1Z, v2X, v2Z);
+        float d2 = sign(px, pz, v2X, v2Z, v3X, v3Z);
+        float d3 = sign(px, pz, v3X, v3Z, v1X, v1Z);
+
+        boolean hadNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        boolean hadPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+        return !(hadNeg && hadPos);
 
     }
 
@@ -596,17 +671,26 @@ class Terrain {
         return (px - v2X) * (v1Z - v2Z) - (v1X - v2X) * (pz - v2Z);
     }
 
-    private float interpolateHeight(float x, float z,
-                                    float v1X, float v1Y, float v1z,
-                                    float v2X, float v2Y, float v2Z,
-                                    float v3X, float v3Y, float v3Z) {
+    private float interpolateHeight(float x, float z, float v1X, float v1Y, float v1Z,
+                                    float v2X, float v2Y, float v2Z, float v3X, float v3Y, float v3Z)
+    {
+        float areaTotal = triangleArea(v1X, v1Z, v2X, v2Z, v3X, v3Z);
+        float area1 = triangleArea(x, z, v2X, v2Z, v3X, v3Z);
+        float area2 = triangleArea(x, z, v3X, v3Z, v1X, v1Z);
+        float area3 = triangleArea(x, z, v1X, v1Z, v2X, v2Z);
+
+        float weight1 = area1 / areaTotal;
+        float weight2 = area2 / areaTotal;
+        float weight3 = area3 / areaTotal;
+
+        return weight1 + v1Y + weight2 + v2Y + weight3 + v3Y;
 
     }
 
     private float triangleArea(float x1, float z1,
                                float x2, float z2,
                                float x3, float z3) {
-
+        return Math.abs((x1 * (z2 - z3) + x2 * (z3 - z1) + x3 * (z1 - z2)) / 2.0f);
     }
 }
 
