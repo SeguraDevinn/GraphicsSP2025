@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
-import org .lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -50,12 +50,22 @@ public class CarSimulation {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         setPerspectiveProjection(45.0f, (float) 800 / 600, 0.1f, 100.0f);
-        GL11.glMatrixMode(GL11.GL_COLOR_MATERIAL);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+        initLighting();
+
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GL11.glColorMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT_AND_DIFFUSE);
 
         // Define light properties
         FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4).put(new float[] {0.0f, 10.0f, 10.0f, 1.0f});
         lightPosition.flip();
+        GL11.glLightfv(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition);
+
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+
+        //Clear the screen and depth buffer
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         // Initalize the car and the terrain
@@ -68,8 +78,10 @@ public class CarSimulation {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             GL11.glLoadIdentity();
 
-            //update car movemenr based on user input
+            //update car movement based on user input
             updateCarMovement();
+
+            updateCamera(car);
 
             //update camera to track the car
             terrain.render();
@@ -207,7 +219,8 @@ public class CarSimulation {
                 side[2], up[2], -forward[2], 0,
                 -dotProduct(side, new float[] {eyeX, eyeY, eyeZ}),
                 -dotProduct(up, new float[] {eyeX, eyeY, eyeZ}),
-                -dotProduct(forward, new float[] {eyeX, eyeY, eyeZ}),
+                dotProduct(forward, new float[] {eyeX, eyeY, eyeZ}),
+                1
         });
         viewMatrix.flip();
 
@@ -327,9 +340,9 @@ class Car {
         // the car body is raised by half of its height so the bottom aligns with the wheels
         float carBodyOffset = 4.0f * carBodyHeight + carBodyHeight / 2.0f;
 
-        // calculuate pitch (forward/backward tilt) and roll (side tilt)
+        // calculate pitch (forward/backward tilt) and roll (side tilt)
         float pitch = (frontLeftWheelY + frontRightWheelY) / 2.0f - (rearLeftWheelY + rearRightWheelY) / 2.0f;
-        float roll = (frontLeftWheelY - rearLeftWheelY) / 2.0f - (frontRightWheelY + rearRightWheelY) / 2.0f;
+        float roll = (frontLeftWheelY + rearLeftWheelY) / 2.0f - (frontRightWheelY + rearRightWheelY) / 2.0f;
 
         // apply the calculated pitch, roll, and average height to the car body
         GL11.glPushMatrix();
@@ -349,6 +362,8 @@ class Car {
 
         // render the wheels
         renderWheels(terrain); // render the wheels based on terrain
+
+        GL11.glPopMatrix();
     }
 
     private void renderCarBody()
@@ -395,8 +410,8 @@ class Car {
         // top face (y = +height/2)
         GL11.glVertex3f(-width / 2, height / 2, -length / 2);
         GL11.glVertex3f(width / 2, height / 2, -length / 2);
-        GL11.glVertex3f(width / 2, -height / 2, length / 2);
-        GL11.glVertex3f(-width / 2, -height / 2, length / 2);
+        GL11.glVertex3f(width / 2, height / 2, length / 2);
+        GL11.glVertex3f(-width / 2, height / 2, length / 2);
 
         // bottom face (y = -height/2)
         GL11.glVertex3f(-width / 2, -height / 2, -length / 2);
@@ -629,7 +644,7 @@ class Terrain {
         int[] indices = model.getIndices();
 
         GL11.glBegin(GL11.GL_TRIANGLES);
-        for (int i = 0; i < vertices.length; i += 3)
+        for (int i = 0; i < indices.length; i += 3)
         {
             int vIndex1 = indices[i] * 3;
             int vIndex2 = indices[i + 1] * 3;
@@ -648,6 +663,32 @@ class Terrain {
     }
 
     public float getTerrainHeightAt(float x, float z) {
+        float[] vertices = model.getVertices();
+
+        int[] indices = model.getIndices();
+
+        for (int i = 0; i < indices.length; i += 3) {
+            int vertexIndex1 = indices[i] * 3;
+            int vertexIndex2 = indices[i + 1] * 3;
+            int vertexIndex3 = indices[i + 2] * 3;
+
+            float v1X = vertices[vertexIndex1];
+            float v1Y = vertices[vertexIndex1 + 1];
+            float v1Z = vertices[vertexIndex1 + 2];
+
+            float v2X = vertices[vertexIndex2];
+            float v2Y = vertices[vertexIndex2 + 1];
+            float v2Z = vertices[vertexIndex2 + 2];
+
+            float v3X = vertices[vertexIndex3];
+            float v3Y = vertices[vertexIndex3 + 1];
+            float v3Z = vertices[vertexIndex3 + 2];
+
+            if (isPointInTriangle(x, z, v1X, v1Z, v2X, v2Z, v3X, v3Z)) {
+                return interpolateHeight(x, z, v1X, v1Y, v1Z, v2X, v2Y, v2Z, v3X, v3Y, v3Z);
+            }
+
+        }
         return 0.0f;
     }
 
@@ -683,7 +724,7 @@ class Terrain {
         float weight2 = area2 / areaTotal;
         float weight3 = area3 / areaTotal;
 
-        return weight1 + v1Y + weight2 + v2Y + weight3 + v3Y;
+        return weight1 * v1Y + weight2 * v2Y + weight3 * v3Y;
 
     }
 
