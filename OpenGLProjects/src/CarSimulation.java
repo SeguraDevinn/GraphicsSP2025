@@ -23,6 +23,11 @@ public class CarSimulation {
     private int height = 600;
     private Car car;
     private Terrain terrain;
+    ///  New code
+    private Car[] cars;
+    private  int activeCarIndex = 0;
+    private boolean tabKeyPreviouslyPressed = false;
+    /// end of new code.
 
     public static void main(String[] args) {
         new CarSimulation().run();
@@ -69,7 +74,12 @@ public class CarSimulation {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         // Initalize the car and the terrain
-        car = new Car();
+
+        /// Start of new code
+        cars = new Car[2];
+        cars[0] = new Car(0.0f, 0.0f, 0.0f, 0.0f);
+        cars[1] = new Car(5.0f, 0.0f, 5.0f, 90.0f);
+        /// End of new code
         terrain = new Terrain("fractal_terrain.obj"); // Load the terrain from an OBJ file
     }
 
@@ -78,20 +88,39 @@ public class CarSimulation {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             GL11.glLoadIdentity();
 
+            /// start of new code
+            handleCarSwitching();
+            /// end of new code
+
             //update car movement based on user input
             updateCarMovement();
 
-            updateCamera(car);
+            updateCamera(cars[activeCarIndex]); /// new code
 
             //update camera to track the car
             terrain.render();
-            car.update();
-            car.render(terrain);
+            ///  start of new code
+            for (Car car : cars) {
+                car.update();
+                car.render(terrain);
+            }
+            /// end of new code
 
             GLFW.glfwSwapBuffers(window);
             GLFW.glfwPollEvents();
         }
     }
+
+    /// start of new code
+    private void handleCarSwitching() {
+        boolean tabPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_TAB) == GLFW.GLFW_PRESS;
+        if (tabPressed && !tabKeyPreviouslyPressed) {
+            activeCarIndex = (activeCarIndex + 1) % cars.length;
+            System.out.println("Switched control to car " + activeCarIndex);
+        }
+        tabKeyPreviouslyPressed = tabPressed;
+    }
+    /// end of new code
 
     public void initLighting() {
         // Enable lighting and first light
@@ -251,18 +280,19 @@ public class CarSimulation {
         return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     }
 
+    /// new code start
     private void updateCarMovement() {
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
-            car.accelerate();
+            cars[activeCarIndex].accelerate();
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS) {
-            car.decelerate();
+            cars[activeCarIndex].decelerate();
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
-            car.turnLeft();
+            cars[activeCarIndex].turnLeft();
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
-            car.turnRight();
+            cars[activeCarIndex].turnRight();
         }
     }
 }
@@ -275,6 +305,20 @@ class Car {
     private float acceleration = 0.01f;
     private float friction = 0.98f;
     private float turnSpeed = 2.0f; // speed of turning
+
+    /// start of new code
+    public Car() {
+        this(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+
+
+    public Car(float startX, float startY, float startZ, float startAngle) {
+        this.x = startX;
+        this.y = startY;
+        this.z = startZ;
+        this.angle = startAngle;
+    }
+    /// end of new code
 
     public float getX() {
         return x;
